@@ -1,12 +1,14 @@
 import Head from 'next/head'
 import { useRouter } from 'next/router' 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import GamesContainer from '../components/GamesContainer';
 import RequestForm from '../components/RequestForm';
 
 const STEAM_API_KEY = '849C8E1481E57D3FB5D2F6E1DBAEC6DB';
 const SGDB_API_KEY = 'fbbb5b7395fa5c37482f5cffafe51226';
+
+export const EventsContext = React.createContext(null)
 
 export default function Home(props) {
   const router = useRouter();
@@ -17,6 +19,15 @@ export default function Home(props) {
   }
 
   const [isReady, setIsReady] = useState(false);
+  const [isRolled, setIsRolled] = useState(false);
+  const [isRerollStarted, setIsRerollStarted] = useState(false)
+
+  useEffect(()=>{
+    if(!router.query.login){
+      setIsReady(false)
+      setIsRolled(false)
+    }
+  }, [router.query.login])
 
   return (
     <div>
@@ -26,11 +37,13 @@ export default function Home(props) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
-        {
-        isReady && props.selectedGames.length > 0 &&
-        <GamesContainer selectedGames={props.selectedGames}/>    
-        }
-        <RequestForm getLogin={getLogin} isLoaded={props.isLoaded} setIsReady={setIsReady} login={login}/>
+        <EventsContext.Provider value={{isReady, isRolled, isRerollStarted, setIsReady, setIsRolled, setIsRerollStarted}}>
+          {
+          isReady && props.selectedGames.length > 0 &&
+          <GamesContainer selectedGames={props.selectedGames}/>    
+          }
+          <RequestForm getLogin={getLogin} isLoaded={props.isLoaded} login={login}/>
+        </EventsContext.Provider>
       </main>
     </div>
   )
@@ -134,8 +147,6 @@ export async function getServerSideProps(context){
   const gamesData = await getGamesData(steamId);
   const selectedIds = await getSelectedIds(gamesData.response.game_count, 10);
   const selectedGames = await getGames(gamesData.response.games, selectedIds);
-
-  
 
   return {
     props: {

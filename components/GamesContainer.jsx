@@ -1,4 +1,6 @@
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useRouter } from 'next/router';
+import React, { useContext, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import {EventsContext} from '../pages/index'
 import Game from '../components/Game';
 
 import styles from './GamesContainer.module.scss';
@@ -21,6 +23,7 @@ export default function GamesContainer(props){
 
     const [gameWidth, setGameWidth] = useState(0);
     const [windowWidth, setWindowWidth] = useState(0);
+    const [rollOffset, setRollOffset] = useState(0)
 
     useEffect(()=>{
         setGameWidth(gameRef.current.offsetWidth)
@@ -37,26 +40,51 @@ export default function GamesContainer(props){
     const targetElem = rouletteLength - 3;
 
     const roll = ()=>{  
-        const rollOffset = centralPosition - (gameWidth * targetElem);
-
         setContainerStyle({
             transform: `translateX(${rollOffset}px)`,
             transition: `transform 3s ease-in-out`
         })
     }
 
-    useEffect(()=>{
-        roll();
-    }, [centralPosition])
+    const hideContainer = ()=>{
+        setContainerStyle({
+            transform: `translateX(${rollOffset - gameWidth * 4}px)`,
+            transition: `transform .5s ease-in-out`
+        })
+    }
 
     
+    useEffect(()=>{
+        setRollOffset(centralPosition - (gameWidth * targetElem))
+    }, [centralPosition])
+
+    useEffect(()=>{
+        roll();
+    }, [rollOffset])
+
+    const {isRerollStarted, setIsRolled, setIsReady, setIsRerollStarted} = useContext(EventsContext);    
 
     const handleTransitionEnd = () => {
         setRouletteOrder(rouletteOrder.map((cur, index)=>{
             cur.isActive = targetElem == index;
             return cur
         }))
+        
+        setIsRolled(true)
+
+        if(isRerollStarted){
+            setIsReady(false)
+
+            setIsRerollStarted(false)
+        }
     }
+
+    useEffect(()=>{
+        if(isRerollStarted){
+            hideContainer();
+            
+        }
+    }, [isRerollStarted])
 
     
     return(

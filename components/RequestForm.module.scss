@@ -1,3 +1,4 @@
+
 .form {
     display: flex;
     flex-direction: column;
@@ -11,6 +12,8 @@
     transform: translate(-50%, 0);
 
     transition: bottom ease-in-out .5s;
+
+    --input-height: 60px;
 }
 
 
@@ -48,7 +51,7 @@
     border-radius: 11px;
 
     width: 330px;
-    height: 60px;
+    height: var(--input-height);
 
     padding: .3em;
     margin-bottom: 20px;
@@ -80,3 +83,50 @@
         opacity: .8;
     }
 }
+
+.submit__reroll {
+    width: var(--input-height);
+    height: var(--input-height);
+
+    fill: #ECECEC;
+
+    background-color: #3389E4;
+    border: none;
+    border-radius: 11px;
+
+    position: absolute;
+    left: calc(100% + 1em);
+    top: 50%;
+
+    z-index: -1;
+
+    transform: translate(-150%, -50%);
+
+    opacity: 0;
+
+    transition: transform .3s ease-out, opacity .2s ease-out;
+
+    cursor: pointer;
+
+    svg {
+        transform: rotate(45deg);
+
+        transition: transform .4s ease-out;
+    }
+
+    &:hover {
+        opacity: .8;
+
+        svg {
+            transform: rotate(405deg);
+        }
+    }
+}
+
+.submit__reroll_active {
+    opacity: 1;
+
+    transform: translate(0, -50%);
+}
+
+
