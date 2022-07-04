@@ -12,4 +12,6 @@ const Game = React.forwardRef((props, ref)=>{
     )
 })
 
+Game.displayName = "Game";
+
 export default Game;
