@@ -29,6 +29,14 @@ export default function Home(props) {
     }
   }, [router.query.login])
 
+  useEffect(()=>{
+    if(props.selectedGames.length > 0){
+      setIsReady(true)
+    }
+  }, [props.selectedGames])
+
+  console.log(isReady, props.selectedGames)
+
   return (
     <div>
       <Head>
@@ -38,10 +46,12 @@ export default function Home(props) {
       </Head>
       <main>
         <EventsContext.Provider value={{isReady, isRolled, isRerollStarted, setIsReady, setIsRolled, setIsRerollStarted}}>
+          <div className="wrapper">
           {
-          isReady && props.selectedGames.length > 0 &&
+          isReady &&
           <GamesContainer selectedGames={props.selectedGames}/>    
           }
+          </div>
           <RequestForm getLogin={getLogin} isLoaded={props.isLoaded} login={login}/>
         </EventsContext.Provider>
       </main>
@@ -77,7 +87,7 @@ export async function getServerSideProps(context){
   }
 
   const getGamesData = async (steamId)=>{
-    const res = await fetch(` http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=${STEAM_API_KEY}&steamid=${steamId}&format=json&include_appinfo=1`);
+    const res = await fetch(` http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=${STEAM_API_KEY}&steamid=${steamId}&format=json&&include_appinfo=1`);
     const gamesData = await res.json();
     return gamesData;
   }
@@ -109,6 +119,9 @@ export async function getServerSideProps(context){
     });
     let json = await res.json();
 
+    if(!json.success || !json.data.length > 0){
+      return null
+    }
     return json.data[0].url
   }
 
@@ -129,7 +142,16 @@ export async function getServerSideProps(context){
     let selectedGames = await Promise.all(
       selectedIds.map(async (currentId)=>{
         const currentGame = gamesList[currentId];
-        const boxArtUrl = await getBoxArtUrl(currentGame.appid);
+        let boxArtUrl = '';
+
+        try {
+          boxArtUrl = await getBoxArtUrl(currentGame.appid);
+        } catch (err){
+          console.log("curGame: ")
+          console.log(currentGame)
+          console.log(currentId);
+          console.log(gamesList[currentId-1], gamesList[currentId], gamesList[currentId+1]);
+        }
 
         let currentGameData = {
           name: currentGame.name,
@@ -143,9 +165,12 @@ export async function getServerSideProps(context){
     return selectedGames
   }
 
+  
+
   const steamId = await getSteamId(context.query.login)
   const gamesData = await getGamesData(steamId);
-  const selectedIds = await getSelectedIds(gamesData.response.game_count, 10);
+  const gamesCount = gamesData.response.games.length-1;
+  const selectedIds = await getSelectedIds(gamesCount);
   const selectedGames = await getGames(gamesData.response.games, selectedIds);
 
   return {

@@ -1,6 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: true,
+  reactStrictMode: false,
+  images: {
+    domains: ['steamcdn-a.akamaihd.net', 'cdn2.steamgriddb.com'],
+  }
 }
 
 module.exports = nextConfig

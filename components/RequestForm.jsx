@@ -16,21 +16,9 @@ export default function RequestForm(props){
 
     const {isReady, isRolled, setIsReady, setIsRerollStarted} = useContext(EventsContext);
 
-    const handleTransitionEnd = (e)=>{
-        if(e.target.tagName == "FORM"){
-            setIsReady(true);
-        }
-    }
-
     const handleRerollClick = () => {
         setIsRerollStarted(true)
     }
-
-    useEffect(()=>{
-        if(!isReady){
-            setIsReady(true)
-        }
-    },[isReady])
 
     let submitRerollClasses = `${styles.submit__reroll}`;
     submitRerollClasses += isRolled ? ` ${styles.submit__reroll_active}` : '';
@@ -38,7 +26,7 @@ export default function RequestForm(props){
     let formClasses = `${styles.form} ${props.isLoaded ? styles.form_sent : ''}`;
     //TODO:: create component with error messages
     return(
-        <form onSubmit={handleSubmit} className={formClasses} onTransitionEnd={handleTransitionEnd}>
+        <form onSubmit={handleSubmit} className={formClasses} >
             <label htmlFor="login" className={styles.label}>Enter your profile URL</label>
             <input type="text" className={styles.input} id="login" autoComplete="off" onChange={(e) => {setLogin(e.target.value)}} value={login ? login : ''}/>
             <input type="submit" className={styles.submit} disabled={!login} value="Roll"/>

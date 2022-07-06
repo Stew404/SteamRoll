@@ -1,4 +1,3 @@
-import { useRouter } from 'next/router';
 import React, { useContext, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {EventsContext} from '../pages/index'
 import Game from '../components/Game';
@@ -48,7 +47,7 @@ export default function GamesContainer(props){
 
     const hideContainer = ()=>{
         setContainerStyle({
-            transform: `translateX(${rollOffset - gameWidth * 4}px)`,
+            transform: `translateX(${rollOffset - gameWidth * 5}px)`,
             transition: `transform .5s ease-in-out`
         })
     }

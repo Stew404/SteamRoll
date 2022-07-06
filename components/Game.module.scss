@@ -9,9 +9,13 @@
     transform: scale(1);
 }
 
-.gameImg {
+.game__img, .game__placeholder {
     width: auto;
     height: 100%;
     object-fit: contain;
+}
+
+.game__placeholder {
+    background-color: blue;
 }
 
